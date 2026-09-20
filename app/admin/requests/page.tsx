@@ -1,5 +1,5 @@
 import { connectDB } from "@/lib/mongodb";
-import { ShiftRequestModel, UserModel } from "@/models";
+import { ShiftRequestModel } from "@/models";
 import { requireSession } from "@/lib/auth";
 import { RequestsPanel } from "@/components/requests-panel";
 

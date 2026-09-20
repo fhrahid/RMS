@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Upload, Download, FileDown, Loader2, AlertCircle, FileUp } from "lucide-react";
@@ -84,10 +85,15 @@ export function CsvPanel() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <Button type="submit" disabled={pending}>
-              {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-              Import &amp; replace month
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button type="submit" disabled={pending}>
+                {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                Import &amp; replace month
+              </Button>
+              <Badge variant="outline" className="border-red-200 text-red-700">
+                Warning: replaces the entire month
+              </Badge>
+            </div>
           </form>
         </CardContent>
       </Card>

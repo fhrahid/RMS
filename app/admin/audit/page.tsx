@@ -1,9 +1,22 @@
 import { connectDB } from "@/lib/mongodb";
 import { AuditLogModel } from "@/models";
 import { requireRoles } from "@/lib/auth";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollText } from "lucide-react";
+
+const ACTION_COLOR: Record<string, string> = {
+  user: "bg-amber-50 text-amber-700 border-amber-200",
+  team: "bg-cyan-50 text-cyan-700 border-cyan-200",
+  request: "bg-violet-50 text-violet-700 border-violet-200",
+  roster: "bg-blue-50 text-blue-700 border-blue-200",
+  system: "bg-muted text-muted-foreground",
+};
+
+function actionStyle(action: string): string {
+  const prefix = action.split(".")[0];
+  return ACTION_COLOR[prefix] ?? "bg-muted text-muted-foreground";
+}
 
 export default async function AuditPage() {
   await requireRoles("ADMIN");
@@ -14,13 +27,24 @@ export default async function AuditPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Audit Log</h1>
+        <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+          Audit Log
+          <Badge variant="secondary">{logs.length}</Badge>
+        </h1>
         <p className="text-sm text-muted-foreground">
           Every roster edit, approval, and user management action is recorded here (latest 200).
         </p>
       </div>
 
       <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <ScrollText className="h-4 w-4 text-primary" /> Activity
+          </CardTitle>
+          <CardDescription>
+            Colors: blue = roster · violet = requests · amber = users · cyan = teams.
+          </CardDescription>
+        </CardHeader>
         <CardContent className="p-0">
           {logs.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
@@ -52,7 +76,9 @@ export default async function AuditPage() {
                       </td>
                       <td className="px-4 py-2.5 font-medium">{log.actorName}</td>
                       <td className="px-4 py-2.5">
-                        <Badge variant="outline" className="font-mono text-[10px]">{log.action}</Badge>
+                        <Badge variant="outline" className={`font-mono text-[10px] ${actionStyle(log.action)}`}>
+                          {log.action}
+                        </Badge>
                       </td>
                       <td className="px-4 py-2.5">{log.target}</td>
                       <td className="max-w-[320px] truncate px-4 py-2.5 text-muted-foreground">{log.details}</td>

@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, X, Inbox } from "lucide-react";
 import { reviewRequest } from "@/app/actions/requests";
 import { shiftLabel, monthLabel } from "@/lib/shifts";
@@ -36,6 +37,14 @@ const STATUS_STYLE: Record<Row["status"], string> = {
 export function RequestsPanel({ rows, canReview }: { rows: Row[]; canReview: boolean }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [filter, setFilter] = useState<"ALL" | Row["status"]>("ALL");
+
+  const pendingCount = rows.filter((r) => r.status === "PENDING").length;
+
+  const filtered = useMemo(
+    () => (filter === "ALL" ? rows : rows.filter((r) => r.status === filter)),
+    [rows, filter]
+  );
 
   function review(id: string, decision: "approve" | "reject") {
     startTransition(async () => {
@@ -63,13 +72,37 @@ export function RequestsPanel({ rows, canReview }: { rows: Row[]; canReview: boo
   }
 
   const order = { PENDING: 0, APPROVED: 1, REJECTED: 2 };
-  const sorted = [...rows].sort(
+  const sorted = [...filtered].sort(
     (a, b) => order[a.status] - order[b.status] || b.createdAt.localeCompare(a.createdAt)
   );
 
   return (
-    <div className="space-y-3">
-      {sorted.map((r) => (
+    <Tabs
+      value={filter}
+      onValueChange={(v) => {
+        if (v) setFilter(v as typeof filter);
+      }}
+    >
+      <TabsList>
+        <TabsTrigger value="ALL">All</TabsTrigger>
+        <TabsTrigger value="PENDING">
+          Pending{pendingCount > 0 && <Badge variant="secondary" className="ml-1">{pendingCount}</Badge>}
+        </TabsTrigger>
+        <TabsTrigger value="APPROVED">Approved</TabsTrigger>
+        <TabsTrigger value="REJECTED">Rejected</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value={filter}>
+        <div className="space-y-3">
+          {sorted.length === 0 && (
+            <Card>
+              <CardContent className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
+                <Inbox className="h-8 w-8" />
+                <p className="text-sm">Nothing here.</p>
+              </CardContent>
+            </Card>
+          )}
+          {sorted.map((r) => (
         <Card key={r._id}>
           <CardContent className="flex flex-wrap items-center gap-3 py-4">
             <Badge variant="outline" className={STATUS_STYLE[r.status]}>
@@ -116,6 +149,8 @@ export function RequestsPanel({ rows, canReview }: { rows: Row[]; canReview: boo
           </CardContent>
         </Card>
       ))}
-    </div>
+        </div>
+      </TabsContent>
+    </Tabs>
   );
 }

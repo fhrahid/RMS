@@ -82,7 +82,7 @@ async function main() {
 
   const password = await bcrypt.hash("demo123", 10);
   const admin = await User.create({ username: "admin", passwordHash: password, fullName: "Administrator", role: "ADMIN" });
-  const _manager = await User.create({ username: "manager", passwordHash: password, fullName: "Demo Manager", role: "MANAGER" });
+  await User.create({ username: "manager", passwordHash: password, fullName: "Demo Manager", role: "MANAGER" });
   console.log("Created admin + manager");
 
   const teamDocs: Record<string, any> = {};

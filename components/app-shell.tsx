@@ -4,11 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, CalendarRange, Inbox, UsersRound, UserCog, ScrollText,
-  FileSpreadsheet, CalendarClock, CalendarDays, LogOut, ChevronsUpDown, ShieldCheck,
+  FileSpreadsheet, CalendarClock, CalendarDays, ClipboardCheck, LogOut,
+  ChevronsUpDown, ShieldCheck, Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import {
+  Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -23,6 +27,7 @@ const NAV: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, roles: ["ADMIN", "MANAGER", "TEAM_LEADER"] },
   { href: "/admin/roster", label: "Roster", icon: CalendarRange, roles: ["ADMIN", "MANAGER", "TEAM_LEADER"] },
   { href: "/admin/requests", label: "Requests", icon: Inbox, roles: ["ADMIN", "MANAGER", "TEAM_LEADER"] },
+  { href: "/admin/approvals", label: "Approvals", icon: ClipboardCheck, roles: ["ADMIN", "MANAGER"] },
   { href: "/my-schedule", label: "My Schedule", icon: CalendarDays, roles: ["TEAM_LEADER"] },
   { href: "/admin/teams", label: "Teams", icon: UsersRound, roles: ["ADMIN"] },
   { href: "/admin/users", label: "Users", icon: UserCog, roles: ["ADMIN"] },
@@ -94,16 +99,42 @@ export function AppShell({ user, children }: { user: ShellUser; children: React.
               </div>
             )}
             {!isEmployee && (
-              <nav className="flex items-center gap-1 md:hidden">
-                {NAV.filter((n) => n.roles.includes(user.role)).slice(0, 4).map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <Button key={item.href} variant="ghost" size="icon" className="h-8 w-8" render={<Link href={item.href} title={item.label} />}>
-                        <Icon className="h-4 w-4" />
-                      </Button>
-                  );
-                })}
-              </nav>
+              <div className="md:hidden">
+                <Sheet>
+                  <SheetTrigger
+                    render={<Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Open menu" />}
+                  >
+                    <Menu className="h-4 w-4" />
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-64">
+                    <SheetHeader>
+                      <SheetTitle>Roster MS</SheetTitle>
+                      <SheetDescription>{ROLE_LABEL[user.role]} console</SheetDescription>
+                    </SheetHeader>
+                    <nav className="flex flex-col gap-1 px-3 pb-4">
+                      {NAV.filter((n) => n.roles.includes(user.role)).map((item) => {
+                        const active =
+                          item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
+                        const Icon = item.icon;
+                        return (
+                          <SheetClose
+                            key={item.href}
+                            render={
+                              <Button
+                                variant={active ? "secondary" : "ghost"}
+                                className={`w-full justify-start gap-3 ${active ? "font-medium" : "text-muted-foreground"}`}
+                              />
+                            }
+                          >
+                            <Icon className="h-4 w-4" />
+                            {item.label}
+                          </SheetClose>
+                        );
+                      })}
+                    </nav>
+                  </SheetContent>
+                </Sheet>
+              </div>
             )}
           </div>
 

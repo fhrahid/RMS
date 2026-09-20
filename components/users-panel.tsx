@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { UserPlus, KeyRound, ShieldCheck, ShieldAlert } from "lucide-react";
+import { UserPlus, KeyRound, ShieldCheck, ShieldAlert, Search } from "lucide-react";
 import { createUser, updateUser, resetPassword } from "@/app/actions/users";
 import { ROLES, ROLE_LABEL, type Role } from "@/lib/shifts";
 
@@ -37,7 +37,20 @@ export function UsersPanel({ users, teams }: { users: UserRow[]; teams: TeamRow[
   const [editActive, setEditActive] = useState(true);
   const [createRole, setCreateRole] = useState<Role>("EMPLOYEE");
   const [createTeam, setCreateTeam] = useState("(none)");
+  const [query, setQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("ALL");
   const [pending, startTransition] = useTransition();
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return users.filter((u) => {
+      if (roleFilter !== "ALL" && u.role !== roleFilter) return false;
+      if (!q) return true;
+      return `${u.fullName} ${u.username} ${u.employeeCode} ${u.teamName}`
+        .toLowerCase()
+        .includes(q);
+    });
+  }, [users, query, roleFilter]);
 
   function run(fn: () => Promise<Result>, close?: () => void) {
     startTransition(async () => {
@@ -56,7 +69,32 @@ export function UsersPanel({ users, teams }: { users: UserRow[]; teams: TeamRow[
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-1 flex-wrap items-center gap-2">
+          <div className="relative w-full max-w-xs">
+            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="pl-8"
+              placeholder="Search name, username, code, team…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v ?? "ALL")}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All roles</SelectItem>
+              {ROLES.map((r) => (
+                <SelectItem key={r} value={r}>{ROLE_LABEL[r]}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <span className="text-xs text-muted-foreground">
+            {filtered.length} of {users.length}
+          </span>
+        </div>
         <Button onClick={() => { setCreateRole("EMPLOYEE"); setCreateTeam("(none)"); setCreating(true); }}>
           <UserPlus className="h-4 w-4" /> New User
         </Button>
@@ -78,7 +116,14 @@ export function UsersPanel({ users, teams }: { users: UserRow[]; teams: TeamRow[
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => (
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
+                      No users match your search.
+                    </td>
+                  </tr>
+                )}
+                {filtered.map((u) => (
                   <tr key={u._id} className="border-b last:border-b-0 hover:bg-muted/40">
                     <td className="px-4 py-2.5 font-medium">{u.fullName}</td>
                     <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">@{u.username}</td>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,12 @@ const CODE_COLOR: Record<string, string> = {
   HL: "bg-emerald-50 text-emerald-700 border-emerald-200",
 };
 
+const STATUS_STYLE: Record<string, string> = {
+  PENDING: "bg-amber-50 text-amber-700 border-amber-200",
+  APPROVED: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  REJECTED: "bg-red-50 text-red-700 border-red-200",
+};
+
 const init: ActionState = {};
 
 export function MySchedule({
@@ -71,7 +77,6 @@ export function MySchedule({
   const [reqShift, setReqShift] = useState("");
   const [swapDay, setSwapDay] = useState(todayDay);
   const [swapTarget, setSwapTarget] = useState("");
-  const [, startTransition] = useTransition();
 
   const [changeState, changeAction, changePending] = useActionState(submitChangeRequest, init);
   const [swapState, swapAction, swapPending] = useActionState(submitSwapRequest, init);
@@ -234,6 +239,9 @@ export function MySchedule({
               {r.status === "PENDING" && <Clock className="h-4 w-4 text-amber-500" />}
               {r.status === "APPROVED" && <CheckCircle2 className="h-4 w-4 text-emerald-600" />}
               {r.status === "REJECTED" && <XCircle className="h-4 w-4 text-red-600" />}
+              <Badge variant="outline" className={`text-[10px] ${STATUS_STYLE[r.status]}`}>
+                {r.status}
+              </Badge>
               <Badge variant="outline" className="font-mono text-[10px]">{r.type}</Badge>
               <span className="text-muted-foreground">{r.month}, day {r.date}</span>
               <span className="text-xs text-muted-foreground">

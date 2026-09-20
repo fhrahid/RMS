@@ -27,12 +27,6 @@ const swapSchema = z.object({
   reason: z.string().min(3, "Reason is required"),
 });
 
-function helperForMonth(month: string) {
-  const map = new Map<string, { shifts: string[] }>();
-  return map;
-}
-void helperForMonth;
-
 async function entryFor(month: string, userId: string) {
   const roster = await RosterMonthModel().findOne({ month });
   if (!roster) return null;

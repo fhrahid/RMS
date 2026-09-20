@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, UserPlus, UserMinus, Crown, UsersRound } from "lucide-react";
+import { Plus, Pencil, Trash2, UserPlus, UserMinus, Crown, UsersRound, Search } from "lucide-react";
 import {
   createTeam, renameTeam, deleteTeam, setTeamLeader, addTeamMember, removeTeamMember,
 } from "@/app/actions/teams";
@@ -31,7 +31,23 @@ export function TeamsPanel({ teams, members }: { teams: TeamRow[]; members: Memb
   const [leading, setLeading] = useState<TeamRow | null>(null);
   const [adding, setAdding] = useState<TeamRow | null>(null);
   const [pickUser, setPickUser] = useState("");
+  const [query, setQuery] = useState("");
   const [pending, startTransition] = useTransition();
+
+  const filteredTeams = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return teams;
+    return teams.filter((t) => {
+      const leader = members.find((m) => m._id === t.leaderId);
+      const memberNames = members
+        .filter((m) => m.teamId === t._id)
+        .map((m) => `${m.fullName} ${m.employeeCode}`)
+        .join(" ");
+      return `${t.name} ${leader?.fullName ?? ""} ${leader?.employeeCode ?? ""} ${memberNames}`
+        .toLowerCase()
+        .includes(q);
+    });
+  }, [teams, members, query]);
 
   function run(fn: () => Promise<Result>, close?: () => void) {
     startTransition(async () => {
@@ -54,7 +70,16 @@ export function TeamsPanel({ teams, members }: { teams: TeamRow[]; members: Memb
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="relative w-full max-w-xs">
+          <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-8"
+            placeholder="Search teams, leaders, members…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
         <Button onClick={() => setCreating(true)}>
           <Plus className="h-4 w-4" /> New Team
         </Button>
@@ -67,9 +92,16 @@ export function TeamsPanel({ teams, members }: { teams: TeamRow[]; members: Memb
             <p className="text-sm">No teams yet — create the first one.</p>
           </CardContent>
         </Card>
+      ) : filteredTeams.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
+            <Search className="h-8 w-8" />
+            <p className="text-sm">No teams match your search.</p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
-          {teams.map((team) => {
+          {filteredTeams.map((team) => {
             const teamMembers = members.filter((m) => m.teamId === team._id);
             const leader = members.find((m) => m._id === team.leaderId);
             return (

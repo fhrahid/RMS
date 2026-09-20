@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { connectDB } from "@/lib/mongodb";
 import {
-  UserModel, TeamModel, ShiftRequestModel, RosterMonthModel, AuditLogModel,
+  UserModel, TeamModel, ShiftRequestModel, RosterMonthModel, AuditLogModel, RosterChangeModel,
 } from "@/models";
 import { requireRoles } from "@/lib/auth";
 import { monthKey, monthLabel, shiftLabel, isWorkCode, dayDate } from "@/lib/shifts";
@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  UsersRound, CalendarCheck2, Inbox, Clock, ArrowRight, CalendarRange,
+  UsersRound, CalendarCheck2, Inbox, Clock, ArrowRight, CalendarRange, ClipboardCheck,
 } from "lucide-react";
 
 export default async function AdminDashboard() {
@@ -17,12 +17,15 @@ export default async function AdminDashboard() {
   await connectDB();
   const thisMonth = monthKey();
 
-  const [employees, teams, pending, roster, recentAudit] = await Promise.all([
+  const [employees, teams, pending, roster, recentAudit, pendingProposals] = await Promise.all([
     UserModel().countDocuments({ role: { $in: ["EMPLOYEE", "TEAM_LEADER"] }, active: true }),
     TeamModel().countDocuments(),
     ShiftRequestModel().countDocuments({ status: "PENDING" }),
     RosterMonthModel().findOne({ month: thisMonth }),
     session.role === "ADMIN" ? AuditLogModel().find().sort({ createdAt: -1 }).limit(6) : Promise.resolve([]),
+    session.role === "ADMIN" || session.role === "MANAGER"
+      ? RosterChangeModel().countDocuments({ status: "PENDING" })
+      : Promise.resolve(0),
   ]);
 
   const today = new Date().getDate();
@@ -116,6 +119,18 @@ export default async function AdminDashboard() {
                 <span className="text-2xl font-bold">{pending}</span>{" "}
                 <span className="text-muted-foreground">request(s) waiting for approval</span>
               </p>
+            )}
+            {(session.role === "ADMIN" || session.role === "MANAGER") && pendingProposals > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-3 w-full justify-start gap-2"
+                render={<Link href="/admin/approvals" />}
+              >
+                <ClipboardCheck className="h-4 w-4 text-primary" />
+                {pendingProposals} roster proposal{pendingProposals === 1 ? "" : "s"} awaiting approval
+                <ArrowRight className="ml-auto h-4 w-4" />
+              </Button>
             )}
           </CardContent>
         </Card>

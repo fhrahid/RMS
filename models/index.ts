@@ -59,6 +59,21 @@ const ShiftRequestSchema = new Schema(
   { timestamps: true }
 );
 
+const RosterChangeSchema = new Schema(
+  {
+    month: { type: String, required: true, match: /^\d{4}-\d{2}$/ },
+    employee: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    day: { type: Number, required: true, min: 1, max: 31 },
+    oldCode: { type: String, default: "" },
+    newCode: { type: String, required: true },
+    proposedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    status: { type: String, required: true, enum: ["PENDING", "APPROVED", "REJECTED"], default: "PENDING" },
+    reviewedBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
+    reviewedAt: { type: Date, default: null },
+  },
+  { timestamps: true }
+);
+
 const AuditLogSchema = new Schema(
   {
     actor: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -74,6 +89,7 @@ export type UserDoc = InferSchemaType<typeof UserSchema> & { _id: mongoose.Types
 export type TeamDoc = InferSchemaType<typeof TeamSchema> & { _id: mongoose.Types.ObjectId };
 export type RosterMonthDoc = InferSchemaType<typeof RosterMonthSchema> & { _id: mongoose.Types.ObjectId };
 export type ShiftRequestDoc = InferSchemaType<typeof ShiftRequestSchema> & { _id: mongoose.Types.ObjectId };
+export type RosterChangeDoc = InferSchemaType<typeof RosterChangeSchema> & { _id: mongoose.Types.ObjectId };
 export type AuditLogDoc = InferSchemaType<typeof AuditLogSchema> & { _id: mongoose.Types.ObjectId };
 
 export const UserModel = () =>
@@ -84,5 +100,13 @@ export const RosterMonthModel = () =>
   (mongoose.models.RosterMonth ?? mongoose.model("RosterMonth", RosterMonthSchema)) as mongoose.Model<RosterMonthDoc>;
 export const ShiftRequestModel = () =>
   (mongoose.models.ShiftRequest ?? mongoose.model("ShiftRequest", ShiftRequestSchema)) as mongoose.Model<ShiftRequestDoc>;
+export const RosterChangeModel = () =>
+  (mongoose.models.RosterChange ?? mongoose.model("RosterChange", RosterChangeSchema)) as mongoose.Model<RosterChangeDoc>;
 export const AuditLogModel = () =>
   (mongoose.models.AuditLog ?? mongoose.model("AuditLog", AuditLogSchema)) as mongoose.Model<AuditLogDoc>;
+
+// Register every model up front so populate() across refs never fails with a
+// MissingSchemaError on a cold path (e.g. populating "team" on a User query).
+[UserModel, TeamModel, RosterMonthModel, ShiftRequestModel, RosterChangeModel, AuditLogModel].forEach(
+  (register) => register()
+);

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CalendarClock, Loader2, AlertCircle } from "lucide-react";
+import { CalendarClock, Loader2, AlertCircle, KeyRound } from "lucide-react";
 import { login } from "@/app/actions/auth";
 import type { ActionState } from "@/app/actions/shared";
 
@@ -64,6 +64,15 @@ export function LoginForm() {
                 {pending && <Loader2 className="h-4 w-4 animate-spin" />}
                 Sign in
               </Button>
+              <Alert className="border-primary/20 bg-primary/5">
+                <KeyRound className="h-4 w-4 text-primary" />
+                <AlertDescription className="text-xs">
+                  Demo accounts — password <code className="rounded bg-muted px-1 font-mono">demo123</code>:
+                  <span className="mt-1 block font-mono text-[11px]">
+                    admin · manager · sll-10001 (leader) · sll-20001 (employee)
+                  </span>
+                </AlertDescription>
+              </Alert>
             </form>
           </CardContent>
           <CardFooter className="justify-center">
