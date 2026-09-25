@@ -10,6 +10,7 @@ const ACTION_COLOR: Record<string, string> = {
   team: "bg-cyan-50 text-cyan-700 border-cyan-200",
   request: "bg-violet-50 text-violet-700 border-violet-200",
   roster: "bg-blue-50 text-blue-700 border-blue-200",
+  auth: "bg-emerald-50 text-emerald-700 border-emerald-200",
   system: "bg-muted text-muted-foreground",
 };
 
@@ -42,7 +43,7 @@ export default async function AuditPage() {
             <ScrollText className="h-4 w-4 text-primary" /> Activity
           </CardTitle>
           <CardDescription>
-            Colors: blue = roster · violet = requests · amber = users · cyan = teams.
+            Colors: blue = roster · violet = requests · amber = users · cyan = teams · green = sign-ins.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">

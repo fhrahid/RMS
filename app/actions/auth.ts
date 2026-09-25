@@ -29,6 +29,8 @@ export async function login(_prev: unknown, formData: FormData): Promise<{ error
     return { error: "Invalid username or password" };
   }
 
+  await logAudit(user, "auth.login", user.username, "Signed in");
+
   await createSession({
     userId: String(user._id),
     username: user.username,
@@ -42,6 +44,10 @@ export async function login(_prev: unknown, formData: FormData): Promise<{ error
 }
 
 export async function logout() {
+  const session = await getSession();
+  if (session) {
+    await logAudit(session, "auth.logout", session.username, "Signed out");
+  }
   await destroySession();
   redirect("/login");
 }

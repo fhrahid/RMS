@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RMS — User Manual</title>
+<style>
+  @page { size: A4; margin: 22mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Calibri, Arial, sans-serif;
+    font-size: 10.5pt; line-height: 1.55; color: #1a1a1a; margin: 0;
+  }
+  .cover { text-align: center; padding-top: 200px; page-break-after: always; }
+  .cover h1 { font-size: 34pt; margin: 0 0 6pt; letter-spacing: 1px; }
+  .cover .sub { font-size: 14pt; color: #555; margin-bottom: 40pt; }
+  .cover .meta { font-size: 10pt; color: #777; margin-top: 60pt; line-height: 1.8; }
+  .badge {
+    display: inline-block; border: 1.5pt solid #333; border-radius: 10pt;
+    padding: 3pt 14pt; font-size: 10pt; letter-spacing: 2pt; margin-bottom: 24pt;
+  }
+  h2 {
+    font-size: 17pt; border-bottom: 2pt solid #333; padding-bottom: 4pt;
+    margin: 0 0 10pt; page-break-before: always; page-break-after: avoid;
+  }
+  h2.first { page-break-before: avoid; }
+  h3 { font-size: 12.5pt; margin: 16pt 0 6pt; page-break-after: avoid; }
+  h4 { font-size: 11pt; margin: 12pt 0 4pt; page-break-after: avoid; }
+  p { margin: 6pt 0; }
+  ul, ol { margin: 6pt 0 6pt 18pt; padding: 0; }
+  li { margin: 2.5pt 0; }
+  table { border-collapse: collapse; width: 100%; margin: 8pt 0 12pt; page-break-inside: avoid; }
+  th, td { border: 0.75pt solid #999; padding: 5pt 8pt; text-align: left; vertical-align: top; }
+  th { background: #efefef; font-weight: 600; }
+  code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 9.5pt; background: #f3f3f3; padding: 1pt 4pt; border-radius: 3pt; }
+  .note {
+    border-left: 3pt solid #666; background: #f7f7f7;
+    padding: 7pt 10pt; margin: 8pt 0; page-break-inside: avoid;
+  }
+  .warn { border-left-color: #b45309; background: #fff8ec; }
+  .toc li { margin: 3pt 0; }
+  .step { margin: 4pt 0; }
+  .role-tag { font-weight: 700; }
+  .flow { font-family: Consolas, monospace; font-size: 9.5pt; background: #f7f7f7; border: 0.75pt solid #ccc; padding: 8pt 10pt; margin: 8pt 0; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<div class="cover">
+  <div class="badge">USER MANUAL</div>
+  <h1>RMS — Roster MS</h1>
+  <div class="sub">Employee Roster Management System</div>
+  <div class="meta">
+    Single-company, multi-role shift roster management<br>
+    Built with Next.js · MongoDB · shadcn/ui<br><br>
+    Document version 1.0 — September 2026<br>
+    University demo project — all data is fictional
+  </div>
+</div>
+
+<!-- ===================== TOC ===================== -->
+<h2 class="first">Contents</h2>
+<ol class="toc">
+  <li>Introduction</li>
+  <li>Getting Started (Login &amp; Logout)</li>
+  <li>Roles &amp; Permissions Overview</li>
+  <li>Guide for Employees</li>
+  <li>Guide for Team Leaders</li>
+  <li>Guide for Managers &amp; Admins (Roster, Approvals, Requests, CSV)</li>
+  <li>Guide for Administrators (Teams, Users, Audit Log)</li>
+  <li>The Approval Workflow Explained</li>
+  <li>Shift Code Reference</li>
+  <li>FAQ &amp; Troubleshooting</li>
+</ol>
+
+<!-- ===================== 1. INTRO ===================== -->
+<h2>1. Introduction</h2>
+<p>
+  <b>RMS (Roster MS)</b> is a web-based Employee Roster Management System for a single company.
+  It lets managers build monthly shift rosters, lets employees view their schedules and request
+  changes or swaps, and lets team leaders plan their own team's shifts — with every change to the
+  roster reviewed and approved by a manager or administrator before it takes effect.
+</p>
+<h3>Key capabilities</h3>
+<ul>
+  <li><b>Role-based access</b> — four roles (Admin, Manager, Team Leader, Employee), each with a tailored workspace.</li>
+  <li><b>Monthly roster calendar</b> — a grid of employees × days with color-coded shift codes.</li>
+  <li><b>Self-service requests</b> — employees request shift <i>changes</i> or <i>swaps</i> with teammates.</li>
+  <li><b>Leader proposals</b> — team leaders stage roster edits in a session and submit them as a batch for approval.</li>
+  <li><b>Bulk approvals</b> — managers/admins review proposed changes on a calendar and approve/reject many at once.</li>
+  <li><b>CSV import/export</b> — bulk-create or replace a month's roster from a spreadsheet.</li>
+  <li><b>Audit trail</b> — every roster edit, approval, and user-management action is recorded.</li>
+</ul>
+
+<!-- ===================== 2. GETTING STARTED ===================== -->
+<h2>2. Getting Started</h2>
+
+<h3>2.1 Opening the system</h3>
+<p>Open the deployed application URL in any modern browser (Chrome, Edge, Firefox). You will be
+greeted by the <b>Sign in</b> screen. Without signing in you cannot view any page.</p>
+
+<h3>2.2 Signing in</h3>
+<ol>
+  <li class="step">Enter your <b>Username</b> — administrators and managers use their chosen username (e.g. <code>admin</code>); employees and team leaders sign in with their employee code in lowercase (e.g. <code>sll-10001</code>).</li>
+  <li class="step">Enter your <b>Password</b>.</li>
+  <li class="step">Click <b>Sign in</b>.</li>
+</ol>
+<div class="note">
+  <b>Demo accounts</b> (password <code>demo123</code> for all):
+  <code>admin</code> — Admin · <code>manager</code> — Manager ·
+  <code>sll-10001</code> — Team Leader · <code>sll-20001</code> — Employee.
+</div>
+
+<h3>2.3 Where you land</h3>
+<table>
+  <tr><th>Role</th><th>Landing page after login</th></tr>
+  <tr><td>Admin / Manager / Team Leader</td><td>Dashboard (<span class="mono">/admin</span>) with workforce stats and pending-work shortcuts</td></tr>
+  <tr><td>Employee</td><td>My Schedule (<span class="mono">/my-schedule</span>)</td></tr>
+</table>
+
+<h3>2.4 Navigating</h3>
+<ul>
+  <li><b>Desktop</b> — a sidebar on the left lists the pages available to your role.</li>
+  <li><b>Mobile</b> — tap the menu (☰) button at the top-left to open the navigation drawer.</li>
+  <li><b>Profile &amp; logout</b> — the avatar button at the top-right opens your profile menu with a <b>Log out</b> action.</li>
+</ul>
+
+<h3>2.5 Signing out</h3>
+<p>Click the avatar (top-right) → <b>Log out</b>. You are returned to the Sign in screen and your
+session cookie is destroyed. Sessions expire automatically after 8 hours.</p>
+
+<!-- ===================== 3. ROLES ===================== -->
+<h2>3. Roles &amp; Permissions Overview</h2>
+<p>The table below summarises what each role can do. Anything not listed is blocked — both in the
+interface and, more importantly, enforced on the server.</p>
+
+<table>
+  <tr>
+    <th>Capability</th><th>Admin</th><th>Manager</th><th>Team Leader</th><th>Employee</th>
+  </tr>
+  <tr><td>Dashboard (stats &amp; shortcuts)</td><td>✔</td><td>✔</td><td>✔</td><td>—</td></tr>
+  <tr><td>View own schedule &amp; submit change/swap requests</td><td>—</td><td>—</td><td>✔</td><td>✔</td></tr>
+  <tr><td>View roster calendar</td><td>✔ (edit all)</td><td>✔ (edit all)</td><td>✔ (own team only)</td><td>✔ (read-only)</td></tr>
+  <tr><td>Edit roster directly (instant)</td><td>✔</td><td>✔</td><td>— (proposes instead)</td><td>—</td></tr>
+  <tr><td>Propose roster changes for approval</td><td>—</td><td>—</td><td>✔</td><td>—</td></tr>
+  <tr><td>Create a new roster month</td><td>✔</td><td>✔</td><td>✔</td><td>—</td></tr>
+  <tr><td>Approve / reject roster proposals (bulk)</td><td>✔</td><td>✔</td><td>—</td><td>—</td></tr>
+  <tr><td>Approve / reject employee change &amp; swap requests</td><td>✔</td><td>✔</td><td>— (view only)</td><td>—</td></tr>
+  <tr><td>CSV import / export</td><td>✔</td><td>✔</td><td>—</td><td>—</td></tr>
+  <tr><td>Teams management</td><td>✔</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td>Users management &amp; password resets</td><td>✔</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td>Audit log</td><td>✔</td><td>—</td><td>—</td><td>—</td></tr>
+</table>
+
+<div class="note"><b>Why team leaders cannot approve:</b> a leader planning shifts for their own team
+(and sometimes requesting changes for themselves) must not also hold approval power over those same
+changes. Approval authority is deliberately kept with Admin/Manager as a segregation of duties.</div>
+
+<!-- ===================== 4. EMPLOYEES ===================== -->
+<h2>4. Guide for Employees</h2>
+<p>Employees land on <b>My Schedule</b>. This is the only workspace they need.</p>
+
+<h3>4.1 Reading your schedule</h3>
+<ul>
+  <li><b>Today / Tomorrow cards</b> — your shift code for the next two days at a glance.</li>
+  <li><b>Monthly calendar</b> — every day of the month with your shift code; today is ring-highlighted, weekends have dashed borders. Hover a day to see the shift's exact times.</li>
+  <li><b>Upcoming work days</b> — your next working days (14-day look-ahead).</li>
+  <li><b>Time off this month</b> — your leave days (sick, casual, emergency, holiday).</li>
+</ul>
+
+<h3>4.2 Requesting a shift change</h3>
+<p>Use this when you want a <i>different shift on a date you are already scheduled</i>.</p>
+<ol>
+  <li class="step">Click <b>Request Change</b> (or simply click the day in the calendar).</li>
+  <li class="step">Pick the <b>Day</b> and the <b>New shift</b> code you want.</li>
+  <li class="step">Write a short <b>Reason</b> (required).</li>
+  <li class="step">Click <b>Submit</b>. A confirmation toast appears at the bottom-right.</li>
+</ol>
+
+<h3>4.3 Requesting a swap with a teammate</h3>
+<p>Use this when you want to <i>exchange shifts with someone on your team for the same day</i>.</p>
+<ol>
+  <li class="step">Click <b>Request Swap</b>.</li>
+  <li class="step">Pick the <b>Day</b> and the <b>teammate</b> you want to swap with (only your team's members are listed).</li>
+  <li class="step">Write a <b>Reason</b> and click <b>Submit</b>.</li>
+</ol>
+
+<h3>4.4 Tracking your requests</h3>
+<p>The <b>My Requests</b> list at the bottom of the page shows your last 20 requests with their
+status: <b>PENDING</b> (awaiting a manager), <b>APPROVED</b> (roster already updated), or
+<b>REJECTED</b>. You may have only one pending request per date.</p>
+
+<!-- ===================== 5. TEAM LEADERS ===================== -->
+<h2>5. Guide for Team Leaders</h2>
+<p>A Team Leader is a working employee who also <b>plans the roster for their own team</b>. Their
+edits are <u>proposals</u> — they reach the roster only after an Admin or Manager approves them.</p>
+
+<h3>5.1 Your own schedule</h3>
+<p>Team leaders are scheduled in the roster just like employees. Open <b>My Schedule</b> (sidebar or
+profile menu) to view your shifts and to submit change/swap requests for yourself — exactly as
+described in section 4.</p>
+
+<h3>5.2 Viewing the team roster</h3>
+<p>Open <b>Roster</b> from the sidebar. You see the rows of <b>your team only</b>. Use the month
+selector to switch months. Cells with an <b>amber outline</b> already have a change awaiting approval.</p>
+
+<h3>5.3 Staging changes (the editing session)</h3>
+<ol>
+  <li class="step">Click any day cell and pick a shift code — the cell turns <b>solid amber</b> and the new code is shown immediately. Nothing is sent to the server yet.</li>
+  <li class="step">Repeat for as many cells as you like — even across different months.</li>
+  <li class="step">A <b>“Roster session”</b> panel appears in the <b>bottom-right corner</b> listing every staged change (employee, date, old → new). Remove an item with its ✕ button if you change your mind.</li>
+  <li class="step">When the batch looks right, click <b>Save changes</b>. All staged edits are submitted in one go and each becomes a pending proposal. <b>Discard</b> throws the session away without submitting.</li>
+</ol>
+<div class="note">Solid amber = staged in your session (not yet saved). Outlined amber = already
+submitted and awaiting approval. The two look different so you never lose track.</div>
+
+<h3>5.4 Creating a roster month</h3>
+<p>If the upcoming month has no roster yet, use the <b>New roster month</b> control at the top of the
+Roster page: pick any month (there is no date limit) and click the button. An empty roster is
+scaffolded for all active employees, ready to be filled in.</p>
+
+<h3>5.5 After you submit</h3>
+<p>Your proposals appear on the managers' <b>Approvals</b> page. Until they approve, the roster
+stays unchanged. You can watch the status via the amber outlines on your grid. Re-staging the same
+cell before it is reviewed simply updates your pending proposal.</p>
+
+<!-- ===================== 6. MANAGERS & ADMINS ===================== -->
+<h2>6. Guide for Managers &amp; Admins</h2>
+<p>Managers and Admins share the operational workspace; Admins additionally manage Teams, Users and
+the Audit log (section 7).</p>
+
+<h3>6.1 Dashboard</h3>
+<p>The dashboard shows live counts: active employees, teams, people working today, and pending
+items. If roster proposals are waiting, a banner links straight to the Approvals page.</p>
+
+<h3>6.2 Roster — direct editing</h3>
+<p>On the <b>Roster</b> page you see <b>all employees of all teams</b> and can <b>click any cell to
+set a shift instantly</b> — no approval needed. Every edit is written to the audit trail. Use the
+<b>New roster month</b> control to scaffold any future month, or the month selector to browse
+history.</p>
+
+<h3>6.3 Approvals — reviewing leader proposals (calendar)</h3>
+<ol>
+  <li class="step">Open <b>Approvals</b> from the sidebar. The <b>Pending</b> tab renders all proposed changes <b>on the actual roster calendar</b>: proposed cells are amber and show the proposed code.</li>
+  <li class="step">Hover an amber cell to see the details — current code → proposed code, the shift times, and which team leader proposed it.</li>
+  <li class="step"><b>Click amber cells to select</b> them (they get a ring). Use <b>Select all</b> / the header checkbox to grab everything for the month, or <b>Deselect all</b> to start over.</li>
+  <li class="step">Click <b>Approve</b> to write every selected change onto the roster at once, or <b>Reject</b> to decline them. A toast confirms how many were applied.</li>
+</ol>
+<p>Approving a cell automatically supersedes any other pending proposals for that same cell, so
+conflicts resolve themselves. The <b>Recent decisions</b> tab lists the last 30 decisions with who
+reviewed them.</p>
+
+<h3>6.4 Requests — employee change &amp; swap requests</h3>
+<p>The <b>Requests</b> page lists employee requests, filterable by status tabs
+(All / Pending / Approved / Rejected). For a <b>CHANGE</b>, approving rewrites that employee's shift
+on that date. For a <b>SWAP</b>, approving exchanges the two employees' shifts for that date.
+Rejecting keeps the roster untouched. All decisions are audit-logged.</p>
+
+<h3>6.5 CSV import / export</h3>
+<ul>
+  <li><b>Export</b> — download the current month's roster as a CSV (also includes a <span class="mono">team</span> column).</li>
+  <li><b>Template</b> — download a sample CSV showing the expected layout.</li>
+  <li><b>Import</b> — choose a month, attach a CSV, and click <b>Import &amp; replace month</b>.
+  <div class="note warn"><b>Warning:</b> importing <u>replaces the entire month's roster</u>. The file must have
+  <span class="mono">employeeCode</span> and <span class="mono">fullName</span> columns, an optional
+  <span class="mono">team</span> column, then <span class="mono">Day1…Day31</span> columns of shift codes.
+  Unknown codes create new employee accounts (default password <span class="mono">demo123</span>).</div></li>
+</ul>
+
+<!-- ===================== 7. ADMIN ===================== -->
+<h2>7. Guide for Administrators</h2>
+
+<h3>7.1 Teams</h3>
+<ul>
+  <li><b>Create / rename / delete</b> teams with the toolbar and card action buttons. Deleting a team un-assigns its members; it does not delete any account.</li>
+  <li><b>Set leader</b> (crown icon) — pick a member; an Employee is automatically promoted to TEAM_LEADER. Choose “— No leader —” to clear.</li>
+  <li><b>Add member</b> — pick any employee/leader; they are moved into this team. Remove someone with the minus button on their row.</li>
+  <li>Use the search box to find a team, leader or member quickly.</li>
+</ul>
+
+<h3>7.2 Users</h3>
+<ul>
+  <li><b>New User</b> — set full name, username, password, role, employee code (required for Employee/Team Leader, format <span class="mono">SLL-12345</span>) and team.</li>
+  <li><b>Edit</b> — change name, role, code, team, and the <b>Active</b> switch (a disabled user cannot sign in).</li>
+  <li><b>Reset password</b> (key icon) — set a new password for the user.</li>
+  <li>Filter the table with the search box and role selector.</li>
+</ul>
+
+<h3>7.3 Audit log</h3>
+<p>A reverse-chronological record (latest 200 events) of every roster edit, proposal, approval,
+request decision, and user/team management action — who did what, to whom, and when. Action badges
+are color-coded by category: blue = roster, violet = requests, amber = users, cyan = teams.</p>
+
+<!-- ===================== 8. WORKFLOW ===================== -->
+<h2>8. The Approval Workflow Explained</h2>
+<p>Roster changes can enter the system two ways, and both end in a fully audited result:</p>
+
+<div class="flow">
+A) Admin / Manager edits a cell directly
+   └── applied IMMEDIATELY + audit log entry
+
+B) Team Leader stages cells  →  “Save changes”
+   └── PENDING proposals created
+         └── Manager/Admin opens Approvals (calendar view)
+               ├── APPROVE (single or bulk) → roster updated + audit log
+               └── REJECT  (single or bulk) → nothing changes + audit log
+
+C) Employee (or Leader, for themselves) submits change/swap request
+   └── Manager/Admin reviews on Requests page
+         ├── APPROVE → roster rewritten (change) or shifts exchanged (swap)
+         └── REJECT  → roster unchanged
+</div>
+
+<p>Employees always see the approved, up-to-date roster on My Schedule. Rejected requests never
+touch the roster.</p>
+
+<!-- ===================== 9. CODES ===================== -->
+<h2>9. Shift Code Reference</h2>
+<table>
+  <tr><th>Code</th><th>Meaning</th><th>Code</th><th>Meaning</th></tr>
+  <tr><td class="mono">M2</td><td>Morning shift 08:00–17:00</td><td class="mono">DO</td><td>Day Off</td></tr>
+  <tr><td class="mono">M3</td><td>Morning shift 09:00–18:00</td><td class="mono">SL</td><td>Sick Leave</td></tr>
+  <tr><td class="mono">M4</td><td>Morning shift 10:00–19:00</td><td class="mono">CL</td><td>Casual Leave</td></tr>
+  <tr><td class="mono">D1</td><td>Day shift 12:00–21:00</td><td class="mono">EL</td><td>Emergency Leave</td></tr>
+  <tr><td class="mono">D2</td><td>Day shift 13:00–22:00</td><td class="mono">HL</td><td>Holiday Leave</td></tr>
+</table>
+<p>Work codes are <span class="mono">M2 M3 M4 D1 D2</span>; everything else is non-working time.
+An empty cell means no shift has been set for that day yet.</p>
+
+<!-- ===================== 10. FAQ ===================== -->
+<h2>10. FAQ &amp; Troubleshooting</h2>
+
+<h4>I forgot my password.</h4>
+<p>Ask an Administrator to reset it (Users → key icon). Passwords are stored hashed and cannot be recovered.</p>
+
+<h4>My schedule shows “No roster published yet”.</h4>
+<p>No roster exists for this or next month. A manager, admin or team leader must create one
+(Roster → “New roster month”) or import a CSV.</p>
+
+<h4>Why is a cell amber on my roster grid?</h4>
+<p><b>Solid amber</b> = you staged it in the current session and have not saved. <b>Outlined amber</b>
+= a proposal for that cell is pending approval. Once approved, the cell simply shows the new shift.</p>
+
+<h4>Why can't I click cells of other teams as a Team Leader?</h4>
+<p>Leaders manage their own team's rows only. Other teams are not part of your editing grid, and the
+server rejects any attempt to submit changes outside your team.</p>
+
+<h4>Why can't Team Leaders approve requests?</h4>
+<p>By design — see the note in section 3. Approval is reserved for Admin/Manager to avoid conflicts
+of interest.</p>
+
+<h4>I have two pending proposals for the same cell from different leaders. What happens?</h4>
+<p>Whichever the manager approves is applied; the other pending proposal for that cell is
+automatically marked rejected (superseded).</p>
+
+<h4>Can I request a swap with someone from another team?</h4>
+<p>No. Swaps are limited to teammates on your own team, enforced both in the interface and on the server.</p>
+
+<h4>Can I have more than one pending request for the same date?</h4>
+<p>No — one pending request per date. Wait for a decision or the request will be declined as a duplicate.</p>
+
+<h4>The toast notifications cover my view.</h4>
+<p>Notifications appear in the bottom-right corner and auto-dismiss; they are intentionally kept
+below the header controls.</p>
+
+<h4>Something looks wrong in the roster — who do I contact?</h4>
+<p>Your Manager or Administrator. Every change is traceable in the Audit log (Admins can see exactly
+who changed what and when).</p>
+
+<p style="margin-top:24pt; color:#777; font-size:9pt;">
+RMS — User Manual · v1.0 · September 2026 · Generated for the RMS demo deployment.
+</p>
+
+</body>
+</html>

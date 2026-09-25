@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, CalendarRange, Inbox, UsersRound, UserCog, ScrollText,
   FileSpreadsheet, CalendarClock, CalendarDays, ClipboardCheck, LogOut,
-  ChevronsUpDown, ShieldCheck, Menu,
+  ChevronsUpDown, ShieldCheck, Menu, BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -32,6 +32,7 @@ const NAV: NavItem[] = [
   { href: "/admin/teams", label: "Teams", icon: UsersRound, roles: ["ADMIN"] },
   { href: "/admin/users", label: "Users", icon: UserCog, roles: ["ADMIN"] },
   { href: "/admin/csv", label: "CSV Import/Export", icon: FileSpreadsheet, roles: ["ADMIN", "MANAGER"] },
+  { href: "/admin/analytics", label: "Reports & Analytics", icon: BarChart3, roles: ["ADMIN", "MANAGER"] },
   { href: "/admin/audit", label: "Audit Log", icon: ScrollText, roles: ["ADMIN"] },
 ];
 
